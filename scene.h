@@ -25,7 +25,7 @@ struct Scene : public std::vector<std::unique_ptr<Plane>>
 
     auto age() const
     {
-        return ::SDL_GetTicks() - _start;
+        return ::SDL_GetTicks() - _start; // how many milisecons passed since it created
     }
 
     template <typename T>

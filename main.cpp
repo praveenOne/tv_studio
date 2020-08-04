@@ -10,30 +10,30 @@
 int main()
 {
     sdl::Window win("Runner?", 700, 400);
-    sdl::EventPump pump;
+    sdl::EventPump pump; // event system sdl 
     auto scene1 = std::make_shared<Scene>(7000, 400, 4);
     scene1->back()->background("rsrc/IMG_6110.jpg");
     auto renderer{win.renderer()};
     Camera cam1(renderer);
     cam1.scene(scene1.get());
-
-    // for (int x{100}; x < 7000; x += 50 + rand() * 7000 / RAND_MAX)
-    // {
+    
+    // ice cube
     int x = 1000;
     auto ice = std::make_unique<Character>();
-    auto p = ice.get();
-    p->_position = {x, 300, 80, 80};
-    Sprite sprite_ice(*renderer, "rsrc/ice-block.png");
-    sprite_ice.setupCharacter(*p);
-    scene1->at(1)->add(std::move(ice));
-    // }
+    ice->_position = {x, 300, 80, 80};
+    Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // sprite is the skin of the character
+    sprite_ice.setupCharacter(*ice);
+    scene1->at(1)->add(std::move(ice)); // plane 0 is the one is closest 
+
+    // cat
     auto cat = std::make_unique<Character>();
     cat->_position = {0, 300, 69, 60};
     Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8, 46, 53, 95);
     sprite_cat.setupCharacter(*cat);
-    HMove(p->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
+    HMove(ice->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
     scene1->at(2)->add(std::move(cat));
 
+    // run the game!
     pump.run(
         [&]() {
             cam1.update();

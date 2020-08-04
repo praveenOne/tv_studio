@@ -24,7 +24,7 @@ struct Sprite
     void setupCharacter(Character &character)
     {
         character._render = [&](sdl::Renderer *renderer, std::function<SDL_Rect(SDL_Rect)> translator) {
-            auto destination = translator(character._position);
+            auto destination = translator(character._position); 
             auto cell = (_current_step % (_loop_to - _loop_from + 1)) + _loop_from;
             auto from = SDL_Rect{_dimensions.w * (cell % _cols), _dimensions.h * (cell / _cols),
                                  _dimensions.w, _dimensions.h};
