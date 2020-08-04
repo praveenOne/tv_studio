@@ -20,7 +20,7 @@ struct Camera
 
     void render()
     {
-        _renderer->Clear(sdl::Color(255, 255, 255));
+        _renderer->Clear(sdl::Color(255, 255, 255)); // clears
         if (_plane_translations.empty())
         {
             create_plane_translations();
@@ -35,10 +35,11 @@ struct Camera
 
     void update()
     {
-        // _camera_z = std::min({(-50) + (static_cast<int>(_scene->age()) / 100), -10});
+        auto last_x = _camera_x;
         _camera_x = _scene->age() / 10;
-        // _zoom = _scene->age() * 0.00001 + 1.0;
-        create_plane_translations();
+        if (last_x != _camera_x) {
+            _plane_translations.resize(0);
+        }
     }
 
 private:
@@ -73,6 +74,10 @@ private:
 
     std::shared_ptr<sdl::Renderer> _renderer;
     std::vector<std::function<SDL_Rect(SDL_Rect)>> _plane_translations;
+    // HOMEWORK 2: please test and answer:
+    // 1- what happens if I set the distance to very far? (_camera_z and _between_planes)
+    // 2- what happens if I set the aperture to very wide?
+    // 3- what happens if I set the aperture to very narrow?
     const units::Distance _camera_z{units::Distance::Metres(10.0)};
     const units::Distance _distance_between_planes{units::Distance::Metres(2.0)};
     int _camera_x;

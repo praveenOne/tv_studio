@@ -23,14 +23,14 @@ struct Sprite
 
     void setupCharacter(Character &character)
     {
-        character._render = [&](sdl::Renderer *renderer, std::function<SDL_Rect(SDL_Rect)> translator) {
+        character._render = [this, &character](auto renderer, auto translator) { // auto is always compile time
             auto destination = translator(character._position); 
             auto cell = (_current_step % (_loop_to - _loop_from + 1)) + _loop_from;
             auto from = SDL_Rect{_dimensions.w * (cell % _cols), _dimensions.h * (cell / _cols),
                                  _dimensions.w, _dimensions.h};
             renderer->Copy(*_texture, &from, &destination);
         };
-        character._update += [&](Scene *scene) {
+        character._update += [this](Scene *scene) {
             _current_step = scene->age() / _step_divisor;
             return true;
         };

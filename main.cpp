@@ -19,18 +19,23 @@ int main()
     
     // ice cube
     int x = 1000;
-    auto ice = std::make_unique<Character>();
-    ice->_position = {x, 300, 80, 80};
+    Character *pIce = nullptr;
     Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // sprite is the skin of the character
-    sprite_ice.setupCharacter(*ice);
-    scene1->at(1)->add(std::move(ice)); // plane 0 is the one is closest 
+    {
+        auto ice = std::make_unique<Character>();
+        pIce = &(*ice);
+        ice->_position = {x, 300, 80, 80};
+        sprite_ice.setupCharacter(*ice);
+        // save the ice character pointer before giving it away
+        scene1->at(1)->add(std::move(ice)); // plane 0 is the one is closest
+    }
 
     // cat
     auto cat = std::make_unique<Character>();
     cat->_position = {0, 300, 69, 60};
     Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8, 46, 53, 95);
     sprite_cat.setupCharacter(*cat);
-    HMove(ice->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
+    HMove(pIce->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
     scene1->at(2)->add(std::move(cat));
 
     // run the game!
@@ -44,4 +49,10 @@ int main()
         std::bind(&Scene::handle_event, scene1, std::placeholders::_1));
 
     return 0;
+
+
+    // Home work 3
+    // 1 Pros / cons of current event system vs inheritance
+    // 2 Read Source code and undestand
+    // 3 Find suitable character for next session
 }
