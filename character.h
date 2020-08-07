@@ -1,29 +1,19 @@
 #pragma once
 #include <functional>
-#include "sdladapters.h"
-#include "scene.h"
 
-class Scene;
+template <typename TRenderable>
+struct Scene;
 
-// A Character is a renderable presence on a plane
-// It may respond to events
-struct Character
-{
-    std::function<void(sdl::Renderer *, std::function<SDL_Rect(SDL_Rect)>)> _render;
-    std::function<bool(SDL_Event *)> _react;
-    std::function<bool(Scene *)> _update;
-    SDL_Rect _position;
-};
-
-std::function<bool(Scene *)> operator+(std::function<bool(Scene *)> const &a, std::function<bool(Scene *)> b)
+template <typename TScene>
+std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, std::function<bool(TScene *)> b)
 {
     if (!a)
         return b;
     if (!b)
         return a;
-    auto pa = std::make_shared<std::function<bool(Scene *)>>(a);
-    auto pb = std::make_shared<std::function<bool(Scene *)>>(b);
-    return [pa, pb](Scene *scene) mutable {
+    auto pa = std::make_shared<std::function<bool(TScene *)>>(a);
+    auto pb = std::make_shared<std::function<bool(TScene *)>>(b);
+    return [pa, pb](TScene *scene) mutable {
         bool result{false};
         if (pa)
         {
@@ -46,8 +36,39 @@ std::function<bool(Scene *)> operator+(std::function<bool(Scene *)> const &a, st
     };
 }
 
-std::function<bool(Scene *)> &operator+=(std::function<bool(Scene *)> &a, std::function<bool(Scene *)> b)
+template <typename TScene>
+std::function<bool(TScene *)> &operator+=(std::function<bool(TScene *)> &a, std::function<bool(TScene *)> b)
 {
     a = a + b;
     return a;
 }
+
+// A Character is a renderable presence on a plane
+// It may respond to events
+template <typename TRenderer, typename TEvent>
+struct Character
+{
+    typedef TEvent EventType;
+    typedef TRenderer RendererType;
+    typedef Scene<Character<TRenderer, TEvent>> SceneType;
+    typedef std::function<bool(SceneType *)> UpdateType;
+
+    std::function<void(TRenderer *, std::function<typename TRenderer::RectType(typename TRenderer::RectType)>)> _render;
+    std::function<bool(EventType *)> _react;
+    SDL_Rect _position;
+
+    void addUpdate(UpdateType update)
+    {
+        _update += update;
+    }
+
+    bool Update(SceneType *scene)
+    {
+        if (_update)
+            return _update(scene);
+        return false;
+    }
+
+private:
+    UpdateType _update;
+};

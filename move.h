@@ -1,12 +1,13 @@
 #include "character.h"
 #include "units.h"
 
+template <typename TCharacter>
 struct HMove
 {
     // speed is in metres/second
-    HMove(SDL_Rect towards, uint32_t start_time, units::Speed const &speed, Character &character)
+    HMove(SDL_Rect towards, uint32_t start_time, units::Speed const &speed, TCharacter &character)
     {
-        character._update += [from = character._position, towards, speed, &character, start_time](Scene *scene) {
+        character.addUpdate([from = character._position, towards, speed, &character, start_time](typename TCharacter::SceneType *scene) {
             auto keep_moving{true};
             auto step = units::Time{scene->age() - start_time} * speed;
             if (from.x < towards.x)
@@ -28,6 +29,6 @@ struct HMove
                 }
             }
             return keep_moving;
-        };
+        });
     }
 };

@@ -254,6 +254,9 @@ namespace sdl
     class Renderer
     {
     public:
+        typedef SDL_Rect RectType;
+        typedef sdl::Texture TextureType;
+
         Renderer(SDL_Window *window)
         {
             _renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -290,7 +293,7 @@ namespace sdl
             return *this;
         }
 
-        auto &FillRect(const SDL_Rect *rc)
+        auto &FillRect(const RectType *rc)
         {
             if (0 != SDL_RenderFillRect(*this, rc))
             {
@@ -316,14 +319,14 @@ namespace sdl
             return *this;
         }
 
-        auto &Copy(Texture const &texture, SDL_Rect const *from = nullptr, SDL_Rect const *to = nullptr)
+        auto &Copy(Texture const &texture, RectType const *from = nullptr, RectType const *to = nullptr)
         {
             if (0 != SDL_RenderCopy(*this, texture, from, to))
                 throw Error();
             return *this;
         }
 
-        auto &CopyEx(Texture const &texture, SDL_Rect const *from, SDL_Rect const *to,
+        auto &CopyEx(Texture const &texture, RectType const *from, RectType const *to,
                      double angle, SDL_Point const *center, SDL_RendererFlip flip)
         {
             if (0 != SDL_RenderCopyEx(*this, texture, from, to, angle, center, flip))
@@ -333,7 +336,7 @@ namespace sdl
             return *this;
         }
 
-        auto &SetViewPort(SDL_Rect *rc)
+        auto &SetViewPort(RectType *rc)
         {
             if (0 != ::SDL_RenderSetViewport(*this, rc))
                 throw Error();
@@ -349,6 +352,17 @@ namespace sdl
             return *this;
         }
 
+        auto CreateTexture(std::string const &filename, int *w = nullptr, int *h = nullptr) const
+        {
+            Surface surface(filename.c_str());
+            auto dimensions{surface.Dimensions()};
+            if (w)
+                *w = dimensions.w;
+            if (h)
+                *h = dimensions.h;
+            return std::make_shared<TextureType>(*this, surface);
+        }
+
     private:
         SDL_Renderer *_renderer;
     };
@@ -358,6 +372,8 @@ namespace sdl
     class EventPump
     {
     public:
+        typedef SDL_Event EventType;
+
         void run(std::function<void()> fn, unsigned int intended_milliseconds, std::function<void(SDL_Event *)> handler)
         {
             SDL_Event ev;

@@ -1,41 +1,59 @@
 #pragma once
 #include <functional>
 #include <memory>
-#include "sdladapters.h"
-#include "character.h"
 
 // A Plane is one positioning line along the x,y axis
-struct Plane : public std::list<std::unique_ptr<Character>>
+template <typename TRenderable>
+struct Plane : public std::list<std::shared_ptr<TRenderable>>
 {
+    typedef typename TRenderable::RendererType TRenderer;
+
+    class ImageBackground
+    {
+    public:
+        ImageBackground(int const &w, int const &h, std::string const &filename)
+            : _w{w}, _h{h}, _filename{filename} {}
+
+        auto operator()(TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator)
+        {
+            if (!_background_texture)
+            {
+                _background_texture = renderer->CreateTexture(_filename);
+            }
+            typename TRenderer::RectType rc{0, 0, _w, _h};
+            rc = translator(rc);
+            renderer->Copy(*_background_texture, nullptr, &rc);
+        }
+
+    private:
+        int const &_w;
+        int const &_h;
+        std::string _filename;
+        std::shared_ptr<typename TRenderer::TextureType> _background_texture;
+    };
+
     Plane(int w, int h) : _w(w), _h(h) {}
 
-    void background(sdl::Color const &color)
+    void background(std::string const &filename)
     {
-        _background = [color, this](sdl::Renderer *renderer, std::function<SDL_Rect(SDL_Rect)> translator) {
-            SDL_Rect rc{0, 0, _w, _h};
+        _image_background = std::make_shared<ImageBackground>(_w, _h, filename);
+        _background = std::bind(&ImageBackground::operator(), _image_background, std::placeholders::_1, std::placeholders::_2);
+    }
+
+    template <typename TColor>
+    void background(TColor const &color)
+    {
+        _background = [color, this](TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) {
+            typename TRenderer::RectType rc{0, 0, _w, _h};
             rc = translator(rc);
             renderer->SetDrawColor(color);
             renderer->FillRect(&rc);
         };
     }
 
-    void background(std::string const &filename)
+    void render(TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) const
     {
-        _background = [filename, this](sdl::Renderer *renderer, std::function<SDL_Rect(SDL_Rect)> translator) {
-            if (!_background_texture)
-            {
-                sdl::Surface surface(filename.c_str());
-                _background_texture = std::make_unique<sdl::Texture>(*renderer, surface);
-            }
-            SDL_Rect rc{0, 0, _w, _h};
-            rc = translator(rc);
-            renderer->Copy(*_background_texture, nullptr, &rc);
-        };
-    }
-
-    void render(sdl::Renderer *renderer, std::function<SDL_Rect(SDL_Rect)> translator) const
-    {
-        SDL_Rect obstacle{120, 300, 50, 50};
+        typename TRenderer::RectType obstacle{120, 300, 50, 50};
         // render background
         if (_background)
             _background(renderer, translator);
@@ -52,13 +70,8 @@ struct Plane : public std::list<std::unique_ptr<Character>>
         }
     }
 
-    void add(std::unique_ptr<Character> &&character)
-    {
-        push_back(std::move(character));
-    }
-
 private:
     int _w, _h;
-    std::function<void(sdl::Renderer *, std::function<SDL_Rect(SDL_Rect)>)> _background;
-    std::unique_ptr<sdl::Texture> _background_texture;
+    std::shared_ptr<ImageBackground> _image_background;
+    std::function<void(TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator)> _background;
 };
