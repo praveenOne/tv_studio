@@ -2,7 +2,6 @@
 #include <string>
 #include <memory>
 #include <iostream>
-#include "character.h"
 
 template <typename TRenderer>
 struct Sprite
@@ -25,8 +24,9 @@ struct Sprite
         character._render = [&](TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) {
             auto destination = translator(character._position);
             auto cell = (_current_step % (_loop_to - _loop_from + 1)) + _loop_from;
-            auto from = SDL_Rect{_dimensions.w * (cell % _cols), _dimensions.h * (cell / _cols),
-                                 _dimensions.w, _dimensions.h};
+            typename TCharacter::RendererType::RectType
+                from{_dimensions.w * (cell % _cols), _dimensions.h * (cell / _cols),
+                     _dimensions.w, _dimensions.h};
             renderer->Copy(*_texture, &from, &destination);
         };
         character.addUpdate([&](typename TCharacter::SceneType *scene) {
@@ -37,7 +37,7 @@ struct Sprite
 
 private:
     std::shared_ptr<typename TRenderer::TextureType> _texture;
-    SDL_Rect _dimensions;
+    typename TRenderer::RectType _dimensions;
     const int _rows;
     const int _cols;
     int _current_step{0}, _loop_from, _loop_to, _step_divisor;

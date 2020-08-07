@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <algorithm>
-#include "scene.h"
 #include "units.h"
 
 // A Camera produces renders by superposing the planes of a scene, from a perspective

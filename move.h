@@ -1,11 +1,10 @@
-#include "character.h"
 #include "units.h"
 
 template <typename TCharacter>
 struct HMove
 {
     // speed is in metres/second
-    HMove(SDL_Rect towards, uint32_t start_time, units::Speed const &speed, TCharacter &character)
+    HMove(typename TCharacter::RendererType::RectType towards, uint32_t start_time, units::Speed const &speed, TCharacter &character)
     {
         character.addUpdate([from = character._position, towards, speed, &character, start_time](typename TCharacter::SceneType *scene) {
             auto keep_moving{true};

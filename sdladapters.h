@@ -257,6 +257,11 @@ namespace sdl
         typedef SDL_Rect RectType;
         typedef sdl::Texture TextureType;
 
+        static auto GetTicks()
+        {
+            return ::SDL_GetTicks();
+        }
+
         Renderer(SDL_Window *window)
         {
             _renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);

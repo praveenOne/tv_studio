@@ -15,7 +15,7 @@ struct Scene
         {
             _planes.push_back(std::make_shared<Plane<TRenderable>>(w, h));
         }
-        _start = ::SDL_GetTicks();
+        _start = TRenderable::RendererType::GetTicks();
     }
 
     auto pixel_size() const
@@ -25,7 +25,7 @@ struct Scene
 
     auto age() const
     {
-        return ::SDL_GetTicks() - _start;
+        return TRenderable::RendererType::GetTicks() - _start;
     }
 
     template <typename T>

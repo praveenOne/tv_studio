@@ -55,7 +55,7 @@ struct Character
 
     std::function<void(TRenderer *, std::function<typename TRenderer::RectType(typename TRenderer::RectType)>)> _render;
     std::function<bool(EventType *)> _react;
-    SDL_Rect _position;
+    typename TRenderer::RectType _position;
 
     void addUpdate(UpdateType update)
     {
