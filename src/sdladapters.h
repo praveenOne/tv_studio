@@ -1,7 +1,11 @@
 #pragma once
+extern "C" {
+#define SDL_MAIN_HANDLED
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+}
 #include <stdexcept>
 #include <string_view>
 #include <string>
@@ -10,6 +14,7 @@
 #include <list>
 #include <iostream>
 #include <map>
+#include <algorithm>
 
 namespace sdl
 {
@@ -28,7 +33,7 @@ namespace sdl
     class Color
     {
     public:
-        Color(u_char red, u_char green, u_char blue, u_char opacity = SDL_ALPHA_OPAQUE)
+        Color(unsigned char red, unsigned char green, unsigned char blue, unsigned char opacity = SDL_ALPHA_OPAQUE)
             : _value{.r = red, .g = green, .b = blue, .a = opacity}
         {
         }

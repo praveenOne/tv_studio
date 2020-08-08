@@ -50,16 +50,16 @@ private:
         _renderer->GetDimensions(&w, &h);
         for (int idx = 0; idx < planes; ++idx)
         {
-            auto reduction = log((_camera_z + _distance_between_planes * idx) / _aperture) * _aperture / 4;
+            auto reduction = static_cast<uint32_t>(log((_camera_z + _distance_between_planes * idx) / _aperture) * _aperture / 4);
             _plane_translations[idx] = ([this, w, h, reduction](typename TRenderer::RectType rc) {
                 // center
                 rc.x -= _camera_x - w / 2;
                 rc.y += _camera_y - h / 2;
                 // zoom
-                rc.x -= w * (1 - _zoom);
-                rc.y += h * (1 - _zoom);
-                rc.w = rc.w * _zoom;
-                rc.h = rc.h * _zoom;
+                rc.x -= static_cast<uint32_t>(w * (1 - _zoom));
+                rc.y += static_cast<uint32_t>(h * (1 - _zoom));
+                rc.w = static_cast<uint32_t>(rc.w * _zoom);
+                rc.h = static_cast<uint32_t>(rc.h * _zoom);
                 // reduce as per the distance
                 rc.x += reduction * rc.w / w;
                 rc.y += reduction * rc.h / h;

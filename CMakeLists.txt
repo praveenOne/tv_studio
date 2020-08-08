@@ -7,9 +7,15 @@ enable_testing()
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
 
+if(MSVC)
+    add_compile_options("/std:c++latest")
+endif()
+
 add_executable(tv_studio src/main.cpp)
 
-target_compile_features(tv_studio PRIVATE cxx_std_17)
+if(NOT MSVC)
+    target_compile_features(tv_studio PRIVATE cxx_std_17)
+endif()
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
