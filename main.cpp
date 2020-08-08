@@ -7,15 +7,42 @@
 #include "move.h"
 #include "units.h"
 
+
 int main()
 {
-    sdl::Window win("Runner?", 700, 400);
+    sdl::Window win("Runner?", 700, 272*2);
     sdl::EventPump pump; // event system sdl 
-    auto scene1 = std::make_shared<Scene>(7000, 400, 4);
-    scene1->back()->background("rsrc/IMG_6110.jpg");
+    auto scene1 = std::make_shared<Scene>(960, 272*2, 4);
+    scene1->back()->background("rsrc/sprites/backgrounds/bg.png");
     auto renderer{win.renderer()};
     Camera cam1(renderer);
     cam1.scene(scene1.get());
+
+    //close trees
+    //ice
+    //cat
+    //mid trees
+    //far trees
+    //background
+
+    //scene1->at(5)->add(std::move(drawBackgroundScene(renderer)));
+    //drawBackgroundScene();
+
+    auto close_trees = std::make_unique<Character>();
+    close_trees->_position = {0, 0, 960, 272*2};
+    Sprite sprite_close_trees(*renderer, "rsrc/sprites/backgrounds/close_trees.png");
+    sprite_close_trees.setupCharacter(*close_trees);
+    scene1->at(1)->add(std::move(close_trees));
+
+    auto far_trees = std::make_unique<Character>();
+    far_trees->_position = {0, 0, 960, 272*2};
+    Sprite sprite_far_trees(*renderer, "rsrc/sprites/backgrounds/far_trees.png");
+    sprite_far_trees.setupCharacter(*far_trees);
+    scene1->at(1)->add(std::move(far_trees));
+
+
+
+
     
     // ice cube
     int x = 1000;
@@ -27,7 +54,7 @@ int main()
         ice->_position = {x, 300, 80, 80};
         sprite_ice.setupCharacter(*ice);
         // save the ice character pointer before giving it away
-        scene1->at(1)->add(std::move(ice)); // plane 0 is the one is closest
+        scene1->at(2)->add(std::move(ice)); // plane 0 is the one is closest
     }
 
     // cat
@@ -36,7 +63,13 @@ int main()
     Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8, 46, 53, 95);
     sprite_cat.setupCharacter(*cat);
     HMove(pIce->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
-    scene1->at(2)->add(std::move(cat));
+    scene1->at(3)->add(std::move(cat));
+
+    auto mid_trees = std::make_unique<Character>();
+    mid_trees->_position = {0, 0, 960, 272*2};
+    Sprite sprite_mid_trees(*renderer, "rsrc/sprites/backgrounds/mid_trees.png");
+    sprite_mid_trees.setupCharacter(*mid_trees);
+    scene1->at(3)->add(std::move(mid_trees));
 
     // run the game!
     pump.run(
@@ -56,3 +89,5 @@ int main()
     // 2 Read Source code and undestand
     // 3 Find suitable character for next session
 }
+
+
