@@ -7,7 +7,7 @@ enable_testing()
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
 
-add_executable(tv_studio main.cpp)
+add_executable(tv_studio src/main.cpp)
 
 target_compile_features(tv_studio PRIVATE cxx_std_17)
 
