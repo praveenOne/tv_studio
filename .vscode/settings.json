@@ -58,6 +58,7 @@
         "cpack",
         "cpack project name",
         "minimum",
+        "msvc",
         "name",
         "project",
         "required"
