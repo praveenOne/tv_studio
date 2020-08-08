@@ -9,16 +9,17 @@
 #include <memory>
 #include <list>
 #include <iostream>
+#include <map>
 
 namespace sdl
 {
-    class Error : std::runtime_error
+    class Error : public std::runtime_error
     {
     public:
         Error() : std::runtime_error(SDL_GetError()) { ; }
     };
 
-    class FontError : std::runtime_error
+    class FontError : public std::runtime_error
     {
     public:
         FontError() : std::runtime_error(TTF_GetError()) { ; }
@@ -59,6 +60,62 @@ namespace sdl
             SDL_Quit();
         }
     };
+
+#pragma region Events
+    class EventPump
+    {
+    public:
+        typedef SDL_Event EventType;
+        typedef std::function<bool(SDL_Event *)> HandlerType;
+
+        void run(std::function<void()> fn, unsigned int intended_milliseconds, HandlerType handler)
+        {
+            SDL_Event ev;
+            auto last_event{SDL_GetTicks()};
+            auto available_time{intended_milliseconds};
+            for (auto code = SDL_WaitEventTimeout(&ev, available_time); !code || ev.type != SDL_EventType::SDL_QUIT; code = SDL_WaitEventTimeout(&ev, available_time))
+            {
+                if (code)
+                {
+                    if (!std::any_of(_handlers.begin(), _handlers.end(), [&ev](auto const &kv) {
+                            return kv.second(&ev);
+                        }))
+                    {
+                        handler(&ev);
+                    }
+                }
+                auto new_time = SDL_GetTicks();
+                auto diff = new_time - last_event;
+                if (diff < intended_milliseconds)
+                {
+                    available_time = intended_milliseconds - diff;
+                }
+                else
+                {
+                    fn();
+                    last_event = new_time;
+                    available_time = intended_milliseconds;
+                }
+            }
+        }
+
+        template <typename T>
+        auto &operator+=(T *o)
+        {
+            _handlers[o] = std::bind(&T::handle_event, o, std::placeholders::_1);
+            return *this;
+        }
+
+        auto &operator-=(void *o)
+        {
+            _handlers.erase(o);
+            return *this;
+        }
+
+    private:
+        std::map<void *, HandlerType> _handlers;
+    };
+#pragma endregion
 
 #pragma region Surface
     class Surface
@@ -175,7 +232,8 @@ namespace sdl
     class Window
     {
     public:
-        Window(std::string_view const &title, int width, int height)
+        Window(std::string_view const &title, int width, int height, EventPump &pump)
+            : _pump{pump}
         {
             _window = SDL_CreateWindow(
                 std::string(title).c_str(),
@@ -186,6 +244,7 @@ namespace sdl
             {
                 throw Error();
             }
+            pump += this;
         }
         ~Window()
         {
@@ -193,6 +252,7 @@ namespace sdl
             {
                 SDL_DestroyWindow(_window);
             }
+            _pump -= this;
         }
 
         std::shared_ptr<Renderer> renderer()
@@ -204,6 +264,30 @@ namespace sdl
             return _renderer;
         }
 
+        void AssumeClosed()
+        {
+            _window = nullptr;
+        }
+
+        auto WindowID() const
+        {
+            return SDL_GetWindowID(_window);
+        }
+
+        bool handle_event(SDL_Event *ev)
+        {
+            if (0 == (ev->type & SDL_WINDOWEVENT) || ev->window.windowID != WindowID())
+            {
+                return false;
+            }
+            if (ev->window.event == SDL_WINDOWEVENT_CLOSE)
+            {
+                AssumeClosed();
+                return true;
+            }
+            return false;
+        }
+
         operator SDL_Window *()
         {
             return _window;
@@ -212,6 +296,7 @@ namespace sdl
     private:
         SDL_Window *_window;
         std::shared_ptr<Renderer> _renderer;
+        EventPump &_pump;
     };
 #pragma endregion
 #pragma region Cursor
@@ -370,45 +455,6 @@ namespace sdl
 
     private:
         SDL_Renderer *_renderer;
-    };
-#pragma endregion
-
-#pragma region Events
-    class EventPump
-    {
-    public:
-        typedef SDL_Event EventType;
-
-        void run(std::function<void()> fn, unsigned int intended_milliseconds, std::function<void(SDL_Event *)> handler)
-        {
-            SDL_Event ev;
-            auto last_event{SDL_GetTicks()};
-            auto available_time{intended_milliseconds};
-            for (auto code = SDL_WaitEventTimeout(&ev, available_time); !code || ev.type != SDL_EventType::SDL_QUIT; code = SDL_WaitEventTimeout(&ev, available_time))
-            {
-                if (code)
-                {
-                    handler(&ev);
-                }
-                auto new_time = SDL_GetTicks();
-                auto diff = new_time - last_event;
-                if (diff < intended_milliseconds)
-                {
-                    available_time = intended_milliseconds - diff;
-                }
-                else
-                {
-                    fn();
-                    last_event = new_time;
-                    available_time = intended_milliseconds;
-                }
-            }
-        }
-    };
-
-    class IHandler
-    {
-        virtual bool handle_event(SDL_Event *ev) = 0;
     };
 #pragma endregion
 

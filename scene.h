@@ -40,7 +40,7 @@ struct Scene
         }
     }
 
-    void handle_event(typename TRenderable::EventType *ev)
+    bool handle_event(typename TRenderable::EventType *ev)
     {
         foreach_character([ev](auto &ch) {
             if (ch->_react)
@@ -48,6 +48,7 @@ struct Scene
                 ch->_react(ev);
             }
         });
+        return true;
     }
 
     void update()
