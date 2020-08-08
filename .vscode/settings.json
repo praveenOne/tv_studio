@@ -50,5 +50,19 @@
     },
     "cSpell.words": [
         "presentvsync"
-    ]
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "cSpell.ignoreWords": [
+        "cmake",
+        "cmake minimum required",
+        "cpack",
+        "cpack project name",
+        "minimum",
+        "name",
+        "project",
+        "required"
+    ],
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "%VCPKG_ROOT%/scripts/buildsystems/vcpkg.cmake"
+    }
 }

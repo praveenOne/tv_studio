@@ -1,2 +1,10 @@
 *.o
 tv_studio
+build
+CMakeFiles
+DartConfiguration.tcl
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+CMakeCache.txt
+cmake_install.cmake
