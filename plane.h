@@ -53,12 +53,9 @@ struct Plane : public std::list<std::shared_ptr<TRenderable>>
 
     void render(TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) const
     {
-        typename TRenderer::RectType obstacle{120, 300, 50, 50};
         // render background
         if (_background)
             _background(renderer, translator);
-
-        obstacle.y -= 100;
 
         // render all characters
         for (auto &ch : *this)
