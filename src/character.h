@@ -17,13 +17,13 @@ std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, 
         bool result{false};
         if (pa)
         {
-            result = pa->operator()(scene);
+            result = (*pa)(scene);
             if (!result)
                 pa.reset();
         }
         if (pb)
         {
-            if (pb->operator()(scene))
+            if ((*pb)(scene))
             {
                 result = true;
             }
