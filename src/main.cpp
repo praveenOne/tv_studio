@@ -19,7 +19,7 @@ int main()
         sdl::Window win("Runner?", 700, 400, pump);
         CharacterType::SceneType scene1(7000, 400, 4);
         scene1.back()->background(std::string("rsrc/IMG_6110.jpg"));
-        auto renderer{win.renderer()};
+        auto renderer{win.renderer()}; // uniform initialization systax
         Camera<CharacterType::RendererType, CharacterType::SceneType> cam1(renderer);
         cam1.scene(&scene1);
 
