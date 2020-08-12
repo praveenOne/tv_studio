@@ -38,12 +38,12 @@ public:
         sprite_ice.setupCharacter(*p);
         scene1.at(1)->push_back(ice);
 
-        auto cat = std::make_shared<CharacterType>();
-        cat->_position = {0, 300, 69, 60};
-        Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8, 46, 53, 95);
-        sprite_cat.setupCharacter(*cat);
-        HMove(p->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
-        scene1.at(2)->push_back(cat);
+        auto girl = std::make_shared<CharacterType>();
+        girl->_position = {0, 300, 69, 60};
+        Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 1, 4, 1);
+        sprite_girl.setupCharacter(*girl);
+        HMove(p->_position, 0, units::Speed::MetresPerSecond(9.0), *girl);
+        scene1.at(2)->push_back(girl);
 
         pump.run(
             [&]() {
