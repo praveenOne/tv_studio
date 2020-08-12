@@ -45,6 +45,27 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "iostream": "cpp"
+    },
+    "cSpell.words": [
+        "presentvsync"
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "cSpell.ignoreWords": [
+        "cmake",
+        "cmake minimum required",
+        "cpack",
+        "cpack project name",
+        "image",
+        "libjpeg",
+        "minimum",
+        "msvc",
+        "name",
+        "project",
+        "required",
+        "sdl",
+        "sdl image libjpeg turbo",
+        "turbo"
+    ]
 }

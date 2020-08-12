@@ -1,0 +1,15 @@
+{
+    "name": "tv-studio",
+    "version-string": "0.0.1",
+    "dependencies": [
+        {
+            "name": "sdl2"
+        },
+        {
+            "name": "sdl2-image",
+            "features": [
+                "libjpeg-turbo"
+            ]
+        }
+    ]
+}
