@@ -49,7 +49,11 @@
         "iostream": "cpp"
     },
     "cSpell.words": [
-        "presentvsync"
+        "kanako",
+        "presentvsync",
+        "spr",
+        "spr kanako walk",
+        "walk"
     ],
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cSpell.ignoreWords": [
