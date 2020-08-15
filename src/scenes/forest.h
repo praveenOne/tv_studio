@@ -19,12 +19,12 @@ public:
         try
         {
             sdl::EventPump pump; // event pump is a loop. distribute events
-            sdl::Window win("Demon Forest", 700, 272 * 2, pump);
-            CharacterType::SceneType scene1(960, 272 * 2, 5); // create a scene type of character
-            scene1.at(4)->background(std::string("rsrc/sprites/backgrounds/bg.png")); // Adding backgrounds
-            scene1.at(3)->background(std::string("rsrc/sprites/backgrounds/far_trees.png")); // set planese
-            scene1.at(2)->background(std::string("rsrc/sprites/backgrounds/mid_trees.png")); // - layer - add 2m between layers (decided by cam)
-            scene1.at(0)->background(std::string("rsrc/sprites/backgrounds/close_trees.png"));
+            sdl::Window win("Demon Forest", 592, 272, pump);
+            CharacterType::SceneType scene1(592*10, 272, 5); // create a scene type of character
+            scene1.at(4)->background(std::string("rsrc/backgrounds/bg.png")); // Adding backgrounds
+            scene1.at(3)->background(std::string("rsrc/backgrounds/far_trees.png")); // set planese
+            scene1.at(2)->background(std::string("rsrc/backgrounds/mid_trees.png")); // - layer - add 2m between layers (decided by cam)
+            scene1.at(0)->background(std::string("rsrc/backgrounds/close_trees.png"));
             auto renderer{win.renderer()}; // uniform initialization systax
             Camera<CharacterType::RendererType, CharacterType::SceneType> cam1(renderer); // create a camera of a render type and scene type- character type is like namespace
             cam1.scene(&scene1); // add scene to the camera - cam.scene accepts pointer to the address of scene1

@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <memory>
+#include <iostream>
 
 // A Plane is one positioning line along the x,y axis
 template <typename TRenderable>
@@ -18,25 +19,23 @@ struct Plane : public std::list<std::shared_ptr<TRenderable>> // inherit from li
         {
             if (!_background_texture)
             {
-                _background_texture = renderer->CreateTexture(_filename);
+                _background_texture = renderer->CreateTexture(_filename, &_imageW, &_imageH);
             }
-            typename TRenderer::RectType rc{0, 0, _w, _h}; // creating a rectangle?
-            rc = translator(rc); // assign ??
-            renderer->Copy(*_background_texture, nullptr, &rc); // can't navigate?? :(
+            for (int x {0}; x < _w; x += _imageW)
+            {
+                typename TRenderer::RectType rc{x, 0, _imageW, _imageH}; // start from 0,0
+                rc = translator(rc); // translation apply to rectangle
+                renderer->Copy(*_background_texture, nullptr, &rc); // can't navigate?? :(
+            }
         }
 
     private:
-        // on an expression "&" can be:
-        //  1) the address-of operator as in "int x; int *px = &x;"
-        //  2) the bitwise operator and as in "(3 & 2) == 2"
-        // on a declaration "&" declares a reference
-        //  example: "int x; int &y;" (the first is an object, the second is a reference)
-        // a reference works similarly to a pointer with three exceptions:
-        // 1) you use the '.' operator instead of '->'
-        // 2) a reference NEEDS to be initialized (ANY class that has reference fields, NEEDS constructor)
-        // 3) a reference CANNOT be changed so that it refrences a different object
+        // _w is the width of the containing plane
         int const &_w; //plane will need two reference.  - backtracing can be done within declaration
+        // _h is the height of the containing plane
         int const &_h;
+        // size of the image used as background
+        int _imageW, _imageH;
         std::string _filename;
         std::shared_ptr<typename TRenderer::TextureType> _background_texture;
     };
