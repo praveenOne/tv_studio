@@ -54,7 +54,7 @@ public:
 
 
             // auto p = ice.get(); // return the raw pointer to p from shared ptr ice
-            ice->_position = {x, 300, 80, 80}; 
+            ice->_position = {x, 210-80, 80, 80}; 
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address) 
             sprite_ice.setupCharacter(*ice); // we have the address. we passing the object
             // we derreference (*) a pointer (an address) so that we get the object pointed to
@@ -66,7 +66,7 @@ public:
             scene1.at(1)->push_back(ice); // why not *ice? - lifetime of the charcter is not tied to the lifetime of the scene. since we don't have garbage collection in cpp we use shared ptr
 
             auto girl = std::make_shared<CharacterType>();
-            girl->_position = {0, 350, 32, 64};
+            girl->_position = {0, 210-64, 32, 64};
             Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 0, 3, 180); // what is 180? - speed of the animation
             sprite_girl.setupCharacter(*girl);
             HMove(ice->_position, 0, units::Speed::MetresPerSecond(8.0), *girl); // passing the object
