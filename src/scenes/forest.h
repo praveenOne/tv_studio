@@ -35,7 +35,7 @@ public:
             // std::vector<std::string> stringVector;
             // std::map<int,std::string> mapOfIntsIntoStrings;
 
-            int x = 1000;
+            int x = 500;
             auto ice = std::make_shared<CharacterType>(); // shared ptr of character type (raw pointer and reference count)
             // smart pointers (std::unique_ptr and std::shared_ptr) keep the concept of RAII
             // Resource Acquisition Is Initialization
@@ -57,6 +57,7 @@ public:
             ice->_position = {x, 210-80, 80, 80}; 
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address) 
             sprite_ice.setupCharacter(*ice); // we have the address. we passing the object
+            HMove(SDL_Rect{x*5,0,80,80},0,units::Speed::MetresPerSecond(2),*ice);
             // we derreference (*) a pointer (an address) so that we get the object pointed to
             // int x{5};
             // int *p = &x; // now p is a pointer to the address of x
@@ -69,7 +70,7 @@ public:
             girl->_position = {0, 210-64, 32, 64};
             Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 0, 3, 180); // what is 180? - speed of the animation
             sprite_girl.setupCharacter(*girl);
-            HMove(ice->_position, 0, units::Speed::MetresPerSecond(8.0), *girl); // passing the object
+            HMove([ice]() {return ice->_position;}, 0, units::Speed::MetresPerSecond(10.0), *girl); // passing the function to get the target rectangle (at every update)
             scene1.at(2)->push_back(girl);
 
             pump.run(
