@@ -11,4 +11,4 @@ run: ../tv_studio
 	cd .. && ./tv_studio
 
 clean:
-	rm ../tv_studio ../*.o
+	rm ../tv_studio *.o
