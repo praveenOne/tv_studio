@@ -21,10 +21,14 @@ struct Plane : public std::list<std::shared_ptr<TRenderable>> // inherit from li
             {
                 _background_texture = renderer->CreateTexture(_filename, &_imageW, &_imageH);
             }
-            for (int x {0}; x < _w; x += _imageW)
+            int actual_width = 0;
+            for (int x {0}; x < _w; x += actual_width)
             {
                 typename TRenderer::RectType rc{x, 0, _imageW, _imageH}; // start from 0,0
+                // the translator will turn our original rectangle, into a new rectangle with gaps on the sides
+                // take into account the gap, and correct for it
                 rc = translator(rc); // translation apply to rectangle
+                actual_width = rc.w;
                 renderer->Copy(*_background_texture, nullptr, &rc); // can't navigate?? :(
             }
         }
