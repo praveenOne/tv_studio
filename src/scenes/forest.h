@@ -9,7 +9,7 @@
 #include "../units.h"
 #include "../character.h"
 
-typedef Character<sdl::Renderer, sdl::EventPump::EventType> CharacterType;
+typedef Character<sdl::Renderer, sdl::EventPump::EventType> CharacterType; // character is implemeted through sdl - need to have renderer and event
 
 class ForestScene
 {
@@ -18,30 +18,58 @@ public:
     {
         try
         {
-            sdl::EventPump pump;
-            sdl::Window win("Demon Forest", 700, 272 * 2, pump);
-            CharacterType::SceneType scene1(960, 272 * 2, 5);
-            scene1.at(4)->background(std::string("rsrc/sprites/backgrounds/bg.png"));
-            scene1.at(3)->background(std::string("rsrc/sprites/backgrounds/far_trees.png"));
-            scene1.at(2)->background(std::string("rsrc/sprites/backgrounds/mid_trees.png"));
-            scene1.at(0)->background(std::string("rsrc/sprites/backgrounds/close_trees.png"));
+            sdl::EventPump pump; // event pump is a loop. distribute events
+            sdl::Window win("Demon Forest", 592, 272, pump);
+            CharacterType::SceneType scene1(592*10, 272, 5); // create a scene type of character
+            scene1.at(4)->background(std::string("rsrc/backgrounds/bg.png")); // Adding backgrounds
+            scene1.at(3)->background(std::string("rsrc/backgrounds/far_trees.png")); // set planese
+            scene1.at(2)->background(std::string("rsrc/backgrounds/mid_trees.png")); // - layer - add 2m between layers (decided by cam)
+            scene1.at(0)->background(std::string("rsrc/backgrounds/close_trees.png"));
             auto renderer{win.renderer()}; // uniform initialization systax
-            Camera<CharacterType::RendererType, CharacterType::SceneType> cam1(renderer);
-            cam1.scene(&scene1);
+            Camera<CharacterType::RendererType, CharacterType::SceneType> cam1(renderer); // create a camera of a render type and scene type- character type is like namespace
+            cam1.scene(&scene1); // add scene to the camera - cam.scene accepts pointer to the address of scene1
+
+            // template instantiation: take the name of the template (such as "std::vector")
+            // and a number of parameters inside angle brackets (such as "<int>")
+            // std::vector<int> integerVector;
+            // std::vector<std::string> stringVector;
+            // std::map<int,std::string> mapOfIntsIntoStrings;
 
             int x = 1000;
-            auto ice = std::make_shared<CharacterType>();
-            auto p = ice.get();
-            p->_position = {x, 300, 80, 80};
-            Sprite sprite_ice(*renderer, "rsrc/ice-block.png");
-            sprite_ice.setupCharacter(*p);
-            scene1.at(1)->push_back(ice);
+            auto ice = std::make_shared<CharacterType>(); // shared ptr of character type (raw pointer and reference count)
+            // smart pointers (std::unique_ptr and std::shared_ptr) keep the concept of RAII
+            // Resource Acquisition Is Initialization
+            // when you instantiate a variable, a resource is created together with it
+            // when your variable goes out of scope, the resource is claimed by the destructor
+            // as if by automatically removing itself
+            // std::make_shared<> create return ptr and return it
+            // {
+            //     std::ofstream ofs("hello.txt"); // we acquire a file
+            //     ofs << "Hello World!" << std::endl;
+            //     // automatically close the file
+            // }
+
+            // ice->_position; // the arrow operator of a smart pointer, will help by resolving the ptr into raw ptr
+            // ice.get()->_position; // this is the equivalent of the previous
+
+
+            // auto p = ice.get(); // return the raw pointer to p from shared ptr ice
+            ice->_position = {x, 210-80, 80, 80}; 
+            Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address) 
+            sprite_ice.setupCharacter(*ice); // we have the address. we passing the object
+            // we derreference (*) a pointer (an address) so that we get the object pointed to
+            // int x{5};
+            // int *p = &x; // now p is a pointer to the address of x
+            // int y {*p}; // now y is initialized to the value of x
+            // we use the * derreference operator, to get the object from the address
+            // & operator address-of is the opposite of * operator derreference
+            scene1.at(1)->push_back(ice); // why not *ice? - lifetime of the charcter is not tied to the lifetime of the scene. since we don't have garbage collection in cpp we use shared ptr
 
             auto girl = std::make_shared<CharacterType>();
-            girl->_position = {0, 300, 32, 64};
-            Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 0, 3, 180);
+            girl->_position = {0, 210-64, 32, 64};
+            Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 0, 3, 180); // what is 180? - speed of the animation
             sprite_girl.setupCharacter(*girl);
-            HMove(p->_position, 0, units::Speed::MetresPerSecond(8.0), *girl);
+            HMove(ice->_position, 0, units::Speed::MetresPerSecond(8.0), *girl); // passing the object
             scene1.at(2)->push_back(girl);
 
             pump.run(
@@ -50,8 +78,15 @@ public:
                     scene1.update();
                     cam1.render();
                 },
-                16,
-                std::bind(&CharacterType::SceneType::handle_event, &scene1, std::placeholders::_1));
+                16, // do at most 60 frames per second (1000/ 60 ≃ 16)
+                // "wait at least 16 ms between rendering"
+                // creates a std::function that takes placeholder_1 (one parameter) into handle_event
+                // and it implicitly uses scene1 as a "this" pointer for handle_event
+                // std::bind(&CharacterType::SceneType::handle_event, &scene1, std::placeholders::_1) - i want to call handle_event in scene1
+                // it is the same as:
+                [&scene1](auto ev) { return scene1.handle_event(ev); }
+                
+                ); // bind handle event to scene ptr?
         }
         catch (sdl::Error &err)
         {

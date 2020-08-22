@@ -6,7 +6,7 @@
 template <typename TRenderer>
 struct Sprite
 {
-    Sprite(TRenderer const &renderer, std::string const &imagefile, int rows = 1, int cols = 1, int initial_step = 0, int loop_to = -1, int step_divisor = -1)
+    Sprite(TRenderer const &renderer, std::string const &imagefile, int rows = 1, int cols = 1, int initial_step = 0, int loop_to = -1, int step_divisor = -1) // sprite sheet?? want to undestand
         : _rows{rows}, _cols{cols}, _loop_from{initial_step}, _loop_to{loop_to}, _step_divisor{step_divisor}
     {
         if (_loop_to == -1)
@@ -21,7 +21,7 @@ struct Sprite
     template <typename TCharacter>
     void setupCharacter(TCharacter &character)
     {
-        character._render = [&](TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) {
+        character._render = [&](TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) { // lamda expression?
             auto destination = translator(character._position);
             auto cell = (_current_step % (_loop_to - _loop_from + 1)) + _loop_from;
             typename TCharacter::RendererType::RectType

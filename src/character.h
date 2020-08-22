@@ -4,22 +4,22 @@
 template <typename TRenderable>
 struct Scene;
 
-template <typename TScene>
-std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, std::function<bool(TScene *)> b)
+template <typename TScene> 
+std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, std::function<bool(TScene *)> b) // a and b are two updates
 {
-    if (!a)
+    if (!a) // if pass function has nothing a return b
         return b;
-    if (!b)
+    if (!b) // likewise above
         return a;
-    auto pa = std::make_shared<std::function<bool(TScene *)>>(a);
+    auto pa = std::make_shared<std::function<bool(TScene *)>>(a); // pa is shared pointer to a
     auto pb = std::make_shared<std::function<bool(TScene *)>>(b);
-    return [pa, pb](TScene *scene) mutable {
-        bool result{false};
+    return [pa, pb](TScene *scene) mutable { // lambda funct
+        bool result{false}; // result assign to false - bool result = false? (why not?)
         if (pa)
         {
-            result = (*pa)(scene);
+            result = (*pa)(scene); // call pa and pass the scene
             if (!result)
-                pa.reset();
+                pa.reset(); // Destroys the object currently managed by the unique_ptr (if any) and takes ownership of p.
         }
         if (pb)
         {
@@ -36,7 +36,7 @@ std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, 
     };
 }
 
-template <typename TScene>
+template <typename TScene> // line 62 - combine two update
 std::function<bool(TScene *)> &operator+=(std::function<bool(TScene *)> &a, std::function<bool(TScene *)> b)
 {
     a = a + b;
@@ -48,10 +48,10 @@ std::function<bool(TScene *)> &operator+=(std::function<bool(TScene *)> &a, std:
 template <typename TRenderer, typename TEvent>
 struct Character
 {
-    typedef TEvent EventType;
+    typedef TEvent EventType; //creates an alias that can be used anywhere in place of a (possibly complex) type name.
     typedef TRenderer RendererType;
-    typedef Scene<Character<TRenderer, TEvent>> SceneType;
-    typedef std::function<bool(SceneType *)> UpdateType;
+    typedef Scene<Character<TRenderer, TEvent>> SceneType; // scene is a vector of characters
+    typedef std::function<bool(SceneType *)> UpdateType; // update type is a function accepting scene and return bool
 
     std::function<void(TRenderer *, std::function<typename TRenderer::RectType(typename TRenderer::RectType)>)> _render;
     std::function<bool(EventType *)> _react;
@@ -59,13 +59,13 @@ struct Character
 
     void addUpdate(UpdateType update)
     {
-        _update += update;
+        _update += update; // combine two update
     }
 
     bool Update(SceneType *scene)
     {
         if (_update)
-            return _update(scene);
+            return _update(scene); // update the scene and return true?
         return false;
     }
 
