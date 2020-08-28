@@ -1,9 +1,17 @@
 #include "units.h"
 #include <functional>
 
+// HOMEWORK: remove "prosecution" concepts from HMove (make it simpler)
+
 template <typename TCharacter>
 struct HMove
 {
+    bool _isCancelled {false};
+
+    void cancel() {
+        _isCancelled = true;
+    }
+
     HMove(typename TCharacter::RendererType::RectType towards, uint32_t start_time, units::Speed const &speed, TCharacter &character)
     {
         auto towards_getter = [towards](){ return towards; };
@@ -17,7 +25,8 @@ struct HMove
     void AddUpdate(std::function<typename TCharacter::RendererType::RectType()> towards_getter, uint32_t start_time, units::Speed const &speed, TCharacter &character, bool continue_pursue)
     { //  speed and character reference passing
         if (continue_pursue) {
-            character.addUpdate([from = character._position, &current = character._position, towards_getter, speed, &character, start_time](typename TCharacter::SceneType *scene) {
+            character.addUpdate([from = character._position, &current = character._position, towards_getter, speed, &character, start_time, this](typename TCharacter::SceneType *scene) {
+                if (_isCancelled) { return false; }
                 auto step = units::Time{scene->age() - start_time} * speed; // calculate distance
                 auto towards = towards_getter();
                 if (current.x < towards.x) // not reached
@@ -32,7 +41,8 @@ struct HMove
             });
         }
         else {
-            character.addUpdate([from = character._position, towards_getter, speed, &character, start_time](typename TCharacter::SceneType *scene) {
+            character.addUpdate([from = character._position, towards_getter, speed, &character, start_time, this](typename TCharacter::SceneType *scene) {
+                if (_isCancelled) { return false; }
                 auto keep_moving{true}; // bool keep_moving and set to true
                 auto step = units::Time{scene->age() - start_time} * speed; // calculate distance
                 auto towards = towards_getter();

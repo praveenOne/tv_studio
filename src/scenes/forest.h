@@ -58,6 +58,9 @@ public:
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address) 
             sprite_ice.setupCharacter(*ice); // we have the address. we passing the object
             HMove(SDL_Rect{x*5,0,80,80},0,units::Speed::MetresPerSecond(2),*ice);
+            // change it into Pursue(xx,x,xx); (keep the reference)
+            // Prosecution proc(xxx,xx,x,x,x,x);
+
             // we derreference (*) a pointer (an address) so that we get the object pointed to
             // int x{5};
             // int *p = &x; // now p is a pointer to the address of x
