@@ -1,0 +1,41 @@
+#include <functional>
+#include <memory>
+
+template<typename TCharacter, typename SceneType, typename TMove>
+class Prosecution
+{
+private:
+    TCharacter &_subject;
+    TCharacter const &_target;
+    bool _isEndOnCollision;
+    std::shared_ptr<TMove> _currentMove;
+    decltype(SceneType.age()) _lastUpdate;
+public:
+    Prosecution(TCharacter &subject, const TCharacter &target, bool isEndOnCollision):
+     _subject{subject}, _target{target}, _isEndOnCollision{isEndOnCollision}  // initialization list, when we have reference we have to use it (references need to be initialize)
+    {
+        // "duck typing": "if it looks like a duck, sounds like a duck, walks like a duck, then it's a duck"
+        _subject.addUpdate([this](auto *scene){ return UpdateSubject(scene);});
+        // nowadays, we don't use "bind" but prefer a lambda like that before
+        // _subject.addUpdate(std::bind(&Prosecution<TCharacter,SceneType>::UpdateSubject, this, std::placeholders::_1));
+    }
+
+    bool UpdateSubject(SceneType *scene) 
+    {
+        // we need to follow the target, two options:
+        // 1. we make the position of our subject closer to the target, or
+        // 2. we create and maintain a HMove that will go towards the target
+
+        // the character's level of dispersion will decide how fast we update the moves
+        auto dispersionCount = _subject.dispersionCount();
+
+        // when it's time to update a move, we will cancel the outstanding move and create a new one
+        auto currentTime = scene->age();
+        if ((currentTime - _lastUpdate) > dispersionCount) {
+            _currentMove->cancel();
+            auto factory{_subject.moveFactory()};
+            _currentMove = factory.move(_target._position);
+            _lastUpdate = currentTime;
+        }
+    } 
+};

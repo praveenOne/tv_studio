@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <memory>
 
 template <typename TRenderable>
 struct Scene;
@@ -67,6 +68,23 @@ struct Character
         if (_update)
             return _update(scene); // update the scene and return true?
         return false;
+    }
+
+    auto dispersionCount() const
+    {
+        return 500;
+    }
+
+    auto moveFactory() const 
+    {
+        // we need to return something that will be called as:
+        // returnedObject(SDL_Rect)
+        // this needs to produce a shared_ptr<HMove> such that
+        // HMove can be called to cancel (move.cancel())
+        return [&](TRenderer::RectType targetRect){
+            // HOMEWORK: complete the list of parameters to the constructor of HMove
+            return std::make_shared<HMove>(...);
+        };
     }
 
 private:
