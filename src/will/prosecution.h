@@ -1,7 +1,7 @@
 #include <functional>
 #include <memory>
 
-template<typename TCharacter, typename SceneType, typename TMove>
+template <typename TCharacter, typename SceneType, typename TMove>
 class Prosecution
 {
 private:
@@ -9,18 +9,18 @@ private:
     TCharacter const &_target;
     bool _isEndOnCollision;
     std::shared_ptr<TMove> _currentMove;
-    decltype(SceneType.age()) _lastUpdate;
+    uint32_t _lastUpdate{0};
+
 public:
-    Prosecution(TCharacter &subject, const TCharacter &target, bool isEndOnCollision):
-     _subject{subject}, _target{target}, _isEndOnCollision{isEndOnCollision}  // initialization list, when we have reference we have to use it (references need to be initialize)
+    Prosecution(TCharacter &subject, const TCharacter &target, bool isEndOnCollision) : _subject{subject}, _target{target}, _isEndOnCollision{isEndOnCollision} // initialization list, when we have reference we have to use it (references need to be initialize)
     {
         // "duck typing": "if it looks like a duck, sounds like a duck, walks like a duck, then it's a duck"
-        _subject.addUpdate([this](auto *scene){ return UpdateSubject(scene);});
+        _subject.addUpdate([this](auto *scene) { return UpdateSubject(scene); });
         // nowadays, we don't use "bind" but prefer a lambda like that before
         // _subject.addUpdate(std::bind(&Prosecution<TCharacter,SceneType>::UpdateSubject, this, std::placeholders::_1));
     }
 
-    bool UpdateSubject(SceneType *scene) 
+    bool UpdateSubject(SceneType *scene)
     {
         // we need to follow the target, two options:
         // 1. we make the position of our subject closer to the target, or
@@ -31,11 +31,27 @@ public:
 
         // when it's time to update a move, we will cancel the outstanding move and create a new one
         auto currentTime = scene->age();
-        if ((currentTime - _lastUpdate) > dispersionCount) {
-            _currentMove->cancel();
-            auto factory{_subject.moveFactory()};
-            _currentMove = factory.move(_target._position);
+        auto keep_will{true};
+        if ((currentTime - _lastUpdate) > dispersionCount)
+        {
+            auto direction{_subject._position.x < _target._position.x ? HDirection::right : HDirection::left};
+            if (_currentMove)
+            {
+                if (_currentMove->direction() != direction)
+                {
+                    _currentMove->cancel();
+                    _currentMove.reset();
+                    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+                    keep_will = !_isEndOnCollision;
+                }
+            }
+            else
+            {
+                auto factory{_subject.moveFactory()};
+                _currentMove = factory(direction, currentTime);
+            }
             _lastUpdate = currentTime;
         }
-    } 
+        return keep_will;
+    }
 };
