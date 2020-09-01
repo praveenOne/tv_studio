@@ -79,8 +79,10 @@ public:
 
             scene1.at(2)->push_back(girl);
 
+            // run of the pump 1) Get message from the user 
             pump.run(
                 [&]() {
+                    // update and render run by different cors
                     cam1.update();
                     scene1.update();
                     cam1.render();

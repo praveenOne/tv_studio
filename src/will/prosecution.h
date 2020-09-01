@@ -41,7 +41,6 @@ public:
                 {
                     _currentMove->cancel();
                     _currentMove.reset();
-                    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
                     keep_will = !_isEndOnCollision;
                 }
             }

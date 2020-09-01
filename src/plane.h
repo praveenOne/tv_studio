@@ -67,6 +67,7 @@ struct Plane : public std::list<std::shared_ptr<TRenderable>> // inherit from li
         };
     }
 
+    // camera will call this
     void render(TRenderer *renderer, std::function<typename TRenderer::RectType(typename TRenderer::RectType)> translator) const
     {
         // render background

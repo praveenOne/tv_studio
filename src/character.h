@@ -51,6 +51,9 @@ struct Character
 {
     typedef TEvent EventType; //creates an alias that can be used anywhere in place of a (possibly complex) type name.
     typedef TRenderer RendererType;
+    // typedef is an alias for a type
+    // int x; // defines a variable x of type int
+    // typedef int X; // defines a type X that is equivalent to int
     typedef Scene<Character<TRenderer, TEvent>> SceneType; // scene is a vector of characters
     typedef std::function<bool(SceneType *)> UpdateType;   // update type is a function accepting scene and return bool
 
