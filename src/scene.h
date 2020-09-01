@@ -13,7 +13,7 @@ struct Scene
         _planes.reserve(z);
         for (; z; --z)
         {
-            _planes.push_back(std::make_shared<Plane<TRenderable>>(w, h)); // assign planse to the render in reverse order
+            _planes.push_back(std::make_shared<Plane<TRenderable>>(w, h)); // assign plane to the render in reverse order
         }
         _start = TRenderable::RendererType::GetTicks(); // get delta time?
     }
@@ -23,12 +23,12 @@ struct Scene
         return typename TRenderable::RendererType::RectType{0, 0, _w, _h};
     }
 
-    auto age() const 
+    auto age() const
     {
         return TRenderable::RendererType::GetTicks() - _start;
     }
 
-    template <typename T> // templeate for for each , it can be do any action
+    template <typename T>            // templeate for for each , it can be do any action
     void foreach_character(T action) // handle event for every character?
     {
         for (auto &plane : _planes)
@@ -43,7 +43,7 @@ struct Scene
     bool handle_event(typename TRenderable::EventType *ev)
     {
         foreach_character([ev](auto &ch) { // for each react
-            if (ch->_react) // _react ??
+            if (ch->_react)                // _react ??
             {
                 ch->_react(ev);
             }

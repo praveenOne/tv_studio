@@ -5,7 +5,7 @@
 template <typename TRenderable>
 struct Scene;
 
-template <typename TScene> 
+template <typename TScene>
 std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, std::function<bool(TScene *)> b) // a and b are two updates
 {
     if (!a) // if pass function has nothing a return b
@@ -15,7 +15,7 @@ std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, 
     auto pa = std::make_shared<std::function<bool(TScene *)>>(a); // pa is shared pointer to a
     auto pb = std::make_shared<std::function<bool(TScene *)>>(b);
     return [pa, pb](TScene *scene) mutable { // lambda funct
-        bool result{false}; // result assign to false - bool result = false? (why not?)
+        bool result{false};                  // result assign to false - bool result = false? (why not?)
         if (pa)
         {
             result = (*pa)(scene); // call pa and pass the scene
@@ -52,7 +52,7 @@ struct Character
     typedef TEvent EventType; //creates an alias that can be used anywhere in place of a (possibly complex) type name.
     typedef TRenderer RendererType;
     typedef Scene<Character<TRenderer, TEvent>> SceneType; // scene is a vector of characters
-    typedef std::function<bool(SceneType *)> UpdateType; // update type is a function accepting scene and return bool
+    typedef std::function<bool(SceneType *)> UpdateType;   // update type is a function accepting scene and return bool
 
     std::function<void(TRenderer *, std::function<typename TRenderer::RectType(typename TRenderer::RectType)>)> _render;
     std::function<bool(EventType *)> _react;
@@ -75,15 +75,15 @@ struct Character
         return 500;
     }
 
-    auto moveFactory() const 
+    auto moveFactory()
     {
         // we need to return something that will be called as:
         // returnedObject(SDL_Rect)
         // this needs to produce a shared_ptr<HMove> such that
         // HMove can be called to cancel (move.cancel())
-        return [&](TRenderer::RectType targetRect){
+        return [&](auto direction, uint32_t start_time) {
             // HOMEWORK: complete the list of parameters to the constructor of HMove
-            return std::make_shared<HMove>(...);
+            return std::make_shared<HMove<Character>>(direction, start_time, units::Speed::MetresPerSecond(8.0), *this);
         };
     }
 
