@@ -57,7 +57,10 @@ public:
             ice->_position = {x, 210 - 80, 80, 80};
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address)
             sprite_ice.setupCharacter(*ice);                    // we have the address. we passing the object
-            // HMove(SDL_Rect{x * 5, 0, 80, 80}, 0, units::Speed::MetresPerSecond(2), *ice);
+            //Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution1(*ice, nullptr, false);
+            //HMove
+            //HMove(HDirection.,)
+            HMove(HDirection::left, 0, units::Speed::MetresPerSecond(2), *ice);
             // change it into Pursue(xx,x,xx); (keep the reference)
             // Prosecution proc(xxx,xx,x,x,x,x);
 
