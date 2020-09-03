@@ -36,7 +36,7 @@ struct Camera
     void update()
     {
         // _camera_z = std::min({(-50) + (static_cast<int>(_scene->age()) / 100), -10});
-        _camera_x = _scene->age() / 10; // why 10?
+        _camera_x = _scene->age() / 20; // why 10?
         // _zoom = _scene->age() * 0.00001 + 1.0;
         create_plane_translations();
     }
