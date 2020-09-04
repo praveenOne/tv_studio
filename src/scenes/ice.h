@@ -28,7 +28,8 @@ public:
 
             auto cat = std::make_shared<CharacterType>();
             cat->_position = {0, 300, 69, 60};
-            Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8, 46, 53, 95);
+            Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8);
+            //  46, 53, 95
             sprite_cat.setupCharacter(*cat);
             // HMove(p->_position, 0, units::Speed::MetresPerSecond(9.0), *cat);
             scene1.at(2)->push_back(cat);

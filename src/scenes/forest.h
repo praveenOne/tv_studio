@@ -56,6 +56,7 @@ public:
             // auto p = ice.get(); // return the raw pointer to p from shared ptr ice
             ice->_position = {x, 210 - 80, 80, 80};
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address)
+            sprite_ice.addAnimation();
             sprite_ice.setupCharacter(*ice);                    // we have the address. we passing the object
             //Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution1(*ice, nullptr, false);
             //HMove
@@ -74,11 +75,18 @@ public:
 
             auto girl = std::make_shared<CharacterType>();
             girl->_position = {0, 210 - 64, 32, 64};
-            Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4, 0, 3, 180); // what is 180? - speed of the animation
+            Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4); // what is 180? - speed of the animation
+            sprite_girl.addAnimation("walkRight",0, 3, 180);
+            sprite_girl.addAnimation("walkLeft",0, 3, 180, SDL_FLIP_HORIZONTAL);
+            sprite_girl.chooseAnimation("walkRight");
             sprite_girl.setupCharacter(*girl);
 
             // HMove(ice->_position, 0, units::Speed::MetresPerSecond(10.0), *girl); // passing the function to get the target rectangle (at every update)
-            Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*girl, *ice, false);
+            Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*girl, *ice, false,
+            {
+                {HDirection::left, [&sprite_girl](){ sprite_girl.chooseAnimation("walkLeft");}},
+                {HDirection::right, [&sprite_girl](){ sprite_girl.chooseAnimation("walkRight");}}
+            });
 
             scene1.at(2)->push_back(girl);
 
