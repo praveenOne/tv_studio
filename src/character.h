@@ -5,6 +5,10 @@
 template <typename TRenderable>
 struct Scene;
 
+// TODO: change the signature of updates, so that they not only take a Scene, but also the age at which the last update was executed
+// this will help moves figure out the new position, by starting with the current position
+// that in turn, will allow for composition of moves (right now, moves are independent of the current position -they take from the start)
+
 template <typename TScene>
 std::function<bool(TScene *)> operator+(std::function<bool(TScene *)> const &a, std::function<bool(TScene *)> b) // a and b are two updates
 {
@@ -51,6 +55,9 @@ struct Character
 {
     typedef TEvent EventType; //creates an alias that can be used anywhere in place of a (possibly complex) type name.
     typedef TRenderer RendererType;
+    // typedef is an alias for a type
+    // int x; // defines a variable x of type int
+    // typedef int X; // defines a type X that is equivalent to int
     typedef Scene<Character<TRenderer, TEvent>> SceneType; // scene is a vector of characters
     typedef std::function<bool(SceneType *)> UpdateType;   // update type is a function accepting scene and return bool
 

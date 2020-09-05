@@ -1,5 +1,6 @@
 #include <functional>
 #include <memory>
+#include <map>
 
 template <typename TCharacter, typename SceneType, typename TMove>
 class Prosecution
@@ -10,9 +11,11 @@ private:
     bool _isEndOnCollision;
     std::shared_ptr<TMove> _currentMove;
     uint32_t _lastUpdate{0};
+    std::map<HDirection, std::function<void()>> _setupDirections;
 
 public:
-    Prosecution(TCharacter &subject, const TCharacter &target, bool isEndOnCollision) : _subject{subject}, _target{target}, _isEndOnCollision{isEndOnCollision} // initialization list, when we have reference we have to use it (references need to be initialize)
+    Prosecution(TCharacter &subject, const TCharacter &target, bool isEndOnCollision, std::map<HDirection, std::function<void()>> setupDirections)
+    : _subject{subject}, _target{target}, _isEndOnCollision{isEndOnCollision}, _setupDirections{setupDirections} // initialization list, when we have reference we have to use it (references need to be initialize)
     {
         // "duck typing": "if it looks like a duck, sounds like a duck, walks like a duck, then it's a duck"
         _subject.addUpdate([this](auto *scene) { return UpdateSubject(scene); });
@@ -41,13 +44,16 @@ public:
                 {
                     _currentMove->cancel();
                     _currentMove.reset();
-                    std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
                     keep_will = !_isEndOnCollision;
                 }
             }
             else
             {
                 auto factory{_subject.moveFactory()};
+                auto setupPos {_setupDirections.find(direction)};
+                if (setupPos != _setupDirections.end()) {
+                    setupPos->second();
+                }
                 _currentMove = factory(direction, currentTime);
             }
             _lastUpdate = currentTime;
