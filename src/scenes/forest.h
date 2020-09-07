@@ -65,6 +65,16 @@ public:
             // change it into Pursue(xx,x,xx); (keep the reference)
             // Prosecution proc(xxx,xx,x,x,x,x);
 
+            auto dog = std::make_shared<CharacterType>();
+            dog->_position ={250, 180, 300/5, 208/5};
+            Sprite sprite_dog(*renderer, "rsrc/sprites/characters/dog_run.png", 1,21);
+            sprite_dog.addAnimation("walkRight",0,20,30);
+            sprite_dog.chooseAnimation("walkRight");
+            sprite_dog.setupCharacter(*dog);
+
+            HMove(HDirection::right, 0, units::Speed::MetresPerSecond(2),*dog);
+            scene1.at(1)->push_back(dog);
+
             // we derreference (*) a pointer (an address) so that we get the object pointed to
             // int x{5};
             // int *p = &x; // now p is a pointer to the address of x
