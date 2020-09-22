@@ -57,7 +57,15 @@ public:
             ice->_position = {x, 210 - 80, 80, 80};
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png"); // passing pointer of the sharedpointer - *renderer (get object from the address)
             sprite_ice.addAnimation();
-            sprite_ice.setupCharacter(*ice);                    // we have the address. we passing the object
+            sprite_ice.setupCharacter(*ice); // we have the address. we passing the object
+
+            // STORY
+            // the ice cube is sensitive to touch
+            // when a character becomes close, it loses energy
+            // when energy drops by a block, it changes color
+            // when energy drops to zero, it disappears
+
+
             //Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution1(*ice, nullptr, false);
             //HMove
             //HMove(HDirection.,)
@@ -66,14 +74,23 @@ public:
             // Prosecution proc(xxx,xx,x,x,x,x);
 
             auto dog = std::make_shared<CharacterType>();
-            dog->_position ={250, 180, 300/5, 208/5};
-            Sprite sprite_dog(*renderer, "rsrc/sprites/characters/dog_run.png", 1,21);
-            sprite_dog.addAnimation("walkRight",0,20,30);
+            dog->_position = {250, 180, 300 / 5, 208 / 5};
+            Sprite sprite_dog(*renderer, "rsrc/sprites/characters/dog_run.png", 1, 21);
+            sprite_dog.addAnimation("walkRight", 0, 20, 30);
+            sprite_dog.addAnimation("walkLeft", 0, 20, 30, SDL_FLIP_HORIZONTAL);
             sprite_dog.chooseAnimation("walkRight");
             sprite_dog.setupCharacter(*dog);
 
-            HMove(HDirection::right, 0, units::Speed::MetresPerSecond(2),*dog);
-            scene1.at(1)->push_back(dog);
+            // STORY
+            // the dog is dormant at the start
+            // when some character passes by the dog, he wakes up and decides to follow the character
+            // (decides to follow means creates a will of prosecution)
+            auto dog_follow = [&](auto passer_by) { Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*dog, passer_by, false,
+                                                                                                                                          {{HDirection::left, [&sprite_dog]() { sprite_dog.chooseAnimation("walkLeft"); }},
+                                                                                                                                           {HDirection::right, [&sprite_dog]() { sprite_dog.chooseAnimation("walkRight"); }}}); };
+
+            // HMove(HDirection::right, 0, units::Speed::MetresPerSecond(2),*dog);
+            // scene1.at(1)->push_back(dog);
 
             // we derreference (*) a pointer (an address) so that we get the object pointed to
             // int x{5};
@@ -81,26 +98,25 @@ public:
             // int y {*p}; // now y is initialized to the value of x
             // we use the * derreference operator, to get the object from the address
             // & operator address-of is the opposite of * operator derreference
-            scene1.at(1)->push_back(ice); // why not *ice? - lifetime of the character is not tied to the lifetime of the scene. since we don't have garbage collection in cpp we use shared ptr
+            scene1.at(1)
+                ->push_back(ice); // why not *ice? - lifetime of the character is not tied to the lifetime of the scene. since we don't have garbage collection in cpp we use shared ptr
 
             auto girl = std::make_shared<CharacterType>();
             girl->_position = {0, 210 - 64, 32, 64};
             Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4); // what is 180? - speed of the animation
-            sprite_girl.addAnimation("walkRight",0, 3, 180);
-            sprite_girl.addAnimation("walkLeft",0, 3, 180, SDL_FLIP_HORIZONTAL);
+            sprite_girl.addAnimation("walkRight", 0, 3, 180);
+            sprite_girl.addAnimation("walkLeft", 0, 3, 180, SDL_FLIP_HORIZONTAL);
             sprite_girl.chooseAnimation("walkRight");
             sprite_girl.setupCharacter(*girl);
 
             // HMove(ice->_position, 0, units::Speed::MetresPerSecond(10.0), *girl); // passing the function to get the target rectangle (at every update)
             Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*girl, *ice, false,
-            {
-                {HDirection::left, [&sprite_girl](){ sprite_girl.chooseAnimation("walkLeft");}},
-                {HDirection::right, [&sprite_girl](){ sprite_girl.chooseAnimation("walkRight");}}
-            });
+                                                                                                   {{HDirection::left, [&sprite_girl]() { sprite_girl.chooseAnimation("walkLeft"); }},
+                                                                                                    {HDirection::right, [&sprite_girl]() { sprite_girl.chooseAnimation("walkRight"); }}});
 
             scene1.at(2)->push_back(girl);
 
-            // run of the pump 1) Get message from the user 
+            // run of the pump 1) Get message from the user
             pump.run(
                 [&]() {
                     // update and render run by different cors
