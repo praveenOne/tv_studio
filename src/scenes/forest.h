@@ -23,10 +23,10 @@ public:
             sdl::EventPump pump; // event pump is a loop. distribute events
             sdl::Window win("Demon Forest", 592, 272, pump);
             CharacterType::SceneType scene1(592 * 10, 272, 5);                       // create a scene type of character
-            scene1.at(4)->background(std::string("rsrc/backgrounds/bg.png"));        // Adding backgrounds
-            scene1.at(3)->background(std::string("rsrc/backgrounds/far_trees.png")); // set planese
-            scene1.at(2)->background(std::string("rsrc/backgrounds/mid_trees.png")); // - layer - add 2m between layers (decided by cam)
-            scene1.at(0)->background(std::string("rsrc/backgrounds/close_trees.png"));
+            // scene1.at(4)->background(std::string("rsrc/backgrounds/bg.png"));        // Adding backgrounds
+            // scene1.at(3)->background(std::string("rsrc/backgrounds/far_trees.png")); // set planese
+            // scene1.at(2)->background(std::string("rsrc/backgrounds/mid_trees.png")); // - layer - add 2m between layers (decided by cam)
+            // scene1.at(0)->background(std::string("rsrc/backgrounds/close_trees.png"));
             auto renderer{win.renderer()};                                                // uniform initialization systax
             Camera<CharacterType::RendererType, CharacterType::SceneType> cam1(renderer); // create a camera of a render type and scene type- character type is like namespace
             cam1.scene(&scene1);                                                          // add scene to the camera - cam.scene accepts pointer to the address of scene1
@@ -75,31 +75,47 @@ public:
             // change it into Pursue(xx,x,xx); (keep the reference)
             // Prosecution proc(xxx,xx,x,x,x,x);
 
-            auto dog = std::make_shared<CharacterType>();
+            auto dog = std::make_shared<CharacterType>("dog");
+            auto girl = std::make_shared<CharacterType>("girl");
+
+
             dog->_position = {250, 180, 300 / 5, 208 / 5};
             Sprite sprite_dog(*renderer, "rsrc/sprites/characters/dog_run.png", 1, 21);
             sprite_dog.addAnimation("walkRight", 0, 20, 30);
+            sprite_dog.addAnimation("stand", 0, 1, 1);
             sprite_dog.addAnimation("walkLeft", 0, 20, 30, SDL_FLIP_HORIZONTAL);
             sprite_dog.setupCharacter(*dog);
-            sprite_dog.chooseAnimation("walkRight");
+            sprite_dog.chooseAnimation("stand");
 
             // STORY
             // the dog is dormant at the start
             // when some character passes by the dog, he wakes up and decides to follow the character
             // (decides to follow means creates a will of prosecution)
-            auto dog_follow = [&](auto passer_by) { 
-                Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*dog, *passer_by, false,
-                    {{HDirection::left, [&sprite_dog]() { sprite_dog.chooseAnimation("walkLeft"); }},
-                    {HDirection::right, [&sprite_dog]() { sprite_dog.chooseAnimation("walkRight"); }}}); 
+            typedef Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> HProsecution;
+            std::unique_ptr<HProsecution> dog_prosecution;
+            auto dog_follow = [&](CharacterType const *passer_by) { 
+        std::cerr << __FILE__ << ":" << __LINE__ << "The passer-by is " << passer_by->_name << std::endl;
+                if (passer_by == dog.get()) return false;
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+                std::map<HDirection, std::function<void()>> reactions 
+                    {
+                        {HDirection::left, [&sprite_dog]() { sprite_dog.chooseAnimation("walkLeft"); }},
+                        {HDirection::right, [&sprite_dog]() { sprite_dog.chooseAnimation("walkRight"); }}
+                    };
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+                dog_prosecution = std::make_unique<HProsecution>(*dog, *passer_by, false, reactions); 
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
                 return false; // after first collision, the dog will not keep colliding
             };
 
 
             // using collission-sensitiveness, make it so that the dog starts following any character that will collide with it
-            CollisionSensitiveness(dog, dog_follow);
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
+            CollisionSensitiveness(*dog, dog_follow);
+        std::cerr << __FILE__ << ":" << __LINE__ << std::endl;
 
             // HMove(HDirection::right, 0, units::Speed::MetresPerSecond(2),*dog);
-            // scene1.at(1)->push_back(dog);
+            scene1.at(2)->push_back(dog);
 
             // we derreference (*) a pointer (an address) so that we get the object pointed to
             // int x{5};
@@ -110,7 +126,6 @@ public:
             // scene1.at(1)
             //     ->push_back(ice); // why not *ice? - lifetime of the character is not tied to the lifetime of the scene. since we don't have garbage collection in cpp we use shared ptr
 
-            auto girl = std::make_shared<CharacterType>();
             girl->_position = {0, 210 - 64, 32, 64};
             Sprite sprite_girl(*renderer, "rsrc/sprites/characters/spr_kanako_walk_.png", 1, 4); // what is 180? - speed of the animation
             sprite_girl.addAnimation("walkRight", 0, 3, 180);
@@ -118,7 +133,7 @@ public:
             sprite_girl.chooseAnimation("walkRight");
             sprite_girl.setupCharacter(*girl);
 
-            // HMove(ice->_position, 0, units::Speed::MetresPerSecond(10.0), *girl); // passing the function to get the target rectangle (at every update)
+            HMove(HDirection::right, 0, units::Speed::MetresPerSecond(5), *girl); // passing the function to get the target rectangle (at every update)
             // Prosecution<CharacterType, CharacterType::SceneType, HMove<CharacterType>> prosecution(*girl, *ice, false,
             //                                                                                        {{HDirection::left, [&sprite_girl]() { sprite_girl.chooseAnimation("walkLeft"); }},
             //                                                                                         {HDirection::right, [&sprite_girl]() { sprite_girl.chooseAnimation("walkRight"); }}});

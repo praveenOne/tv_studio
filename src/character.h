@@ -64,6 +64,12 @@ struct Character
     std::function<void(TRenderer *, std::function<typename TRenderer::RectType(typename TRenderer::RectType)>)> _render;
     std::function<bool(EventType *)> _react;
     typename TRenderer::RectType _position;
+    std::string _name;
+
+    Character(std::string const& name)
+    {
+        _name = name;
+    }
 
     void addUpdate(UpdateType update)
     {

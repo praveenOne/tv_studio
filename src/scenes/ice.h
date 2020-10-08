@@ -19,14 +19,14 @@ public:
             cam1.scene(&scene1);
 
             int x = 1000;
-            auto ice = std::make_shared<CharacterType>();
+            auto ice = std::make_shared<CharacterType>("ice");
             auto p = ice.get();
             p->_position = {x, 300, 80, 80};
             Sprite sprite_ice(*renderer, "rsrc/ice-block.png");
             sprite_ice.setupCharacter(*p);
             scene1.at(1)->push_back(ice);
 
-            auto cat = std::make_shared<CharacterType>();
+            auto cat = std::make_shared<CharacterType>("cat");
             cat->_position = {0, 300, 69, 60};
             Sprite sprite_cat(*renderer, "rsrc/cat-tile.png", 10, 8);
             //  46, 53, 95

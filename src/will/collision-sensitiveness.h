@@ -130,16 +130,16 @@ class CollisionSensitiveness
 {
 public:
     // you create a sensitiveness by defining the action that will happen
-    CollisionSensitiveness(TCharacter subject, ActionT reaction)
+    CollisionSensitiveness(TCharacter &subject, ActionT reaction)
     {
-        subject->addUpdate([&](auto *scene) {
+        subject.addUpdate([&](auto *scene) {
             auto result = true;
             // find characters that are within the same space
-            scene->foreach_character([subject, reaction, &result](TCharacter &ch) {
-                if (overlaps(subject->_position, ch->_position))
+            scene->foreach_character([subject, reaction, &result](auto const ch) {
+                if ((&subject != ch.get()) && overlaps(subject._position, ch->_position))
                 {
                     // when they share the space, we are sensitive so react
-                    result &= reaction(ch);
+                    result &= reaction(ch.get());
                 }
             });
             return result;
